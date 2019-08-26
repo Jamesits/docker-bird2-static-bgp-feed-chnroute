@@ -1,0 +1,27 @@
+log syslog all;
+router id 11.4.51.4;
+# debug protocols all;
+watchdog warning 5 s;
+watchdog timeout 30 s;
+ipv4 table feed_v4;
+protocol device {}
+protocol direct { ipv4; }
+
+include "policy_routing/ip/*.conf";
+
+template bgp bgp_router {
+        local as {{LOCAL_AS}};
+        neighbor as {{NEIGHBOR_AS}};
+        multihop;
+        graceful restart on;
+        rr client;
+        ipv4 {
+                table feed_v4;
+                import none;
+                export all;
+        };
+}
+
+protocol bgp bgp_router_0 from bgp_router {
+        neighbor {{NEIGHBOR_IPV4}};
+}
